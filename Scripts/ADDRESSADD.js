@@ -8,11 +8,11 @@ function getScriptText(vScriptName){
 	vScriptName = vScriptName.toUpperCase();
 	var emseBiz = aa.proxyInvoker.newInstance("com.accela.aa.emse.emse.EMSEBusiness").getOutput();
 	var emseScript = emseBiz.getMasterScript(aa.getServiceProviderCode(),vScriptName);
-	return emseScript.getScriptText() + "";	
+	return emseScript.getScriptText() + ""; 	
 }
 
 //Parameters Initialization
-showMessage = true;		
+showMessage = true; 		
 showDebug = true;
 var s_id1 = aa.env.getValue("PermitId1");
 var s_id2 = aa.env.getValue("PermitId2");
@@ -57,5 +57,6 @@ if (searchResult.getSuccess())
 		//Create new address for cap.
         createAddresses(targetCapID, newAddressModel);
 	}
-} **/
-//latest update **/
+}  **/
+//latest update
+//update 2
