@@ -146,4 +146,4 @@ if (debug.indexOf("**ERROR") > 0) {
 		aa.env.setValue("ScriptReturnMessage", message);
 	if (showDebug)
 		aa.env.setValue("ScriptReturnMessage", debug);
-}
+}//latest update
