@@ -37,26 +37,60 @@
         "action": {
           "assessFees": [
             {
-              "feeCode": "ABCARTSA02",
+              "feeAmount": "${getFeeAmount(applicationType, severity)}",
+              "feeCode": "${getFeeCode(applicationType)}",
               "feeInvoice": "Y",
               "feePeriod": "FINAL",
-              "feeQuantity": 1,
-              "feeSchedule": "ABC_ARTS_APP"
+              "feeQuantity": "${calculateFeeQuantity(applicationType, severity)}",
+              "feeSchedule": "${config.feeSchedules[applicationType] || 'DEFAULT_ARTS_APP'}",
+              "paymentMethod": "online",
+              "paymentProvider": "stripe"
             }
           ],
+          "feeWaivers": {
+            "autoApproval": false,
+            "conditions": [
+              "firstTimeApplicant",
+              "lowIncomeQualified",
+              "emergencyPermit"
+            ],
+            "enabled": true,
+            "requiresReview": true
+          },
           "notifications": [
             {
+              "data": {
+                "feeAmount": "${getFeeAmount(applicationType, severity)}",
+                "feeCode": "${getFeeCode(applicationType)}",
+                "paymentUrl": "${generatePaymentUrl(applicationId)}"
+              },
               "recipients": [
                 "applicant",
                 "reviewer"
               ],
               "template": "fee_assessment_notification",
               "type": "email"
+            },
+            {
+              "data": {
+                "feeAmount": "${getFeeAmount(applicationType, severity)}"
+              },
+              "recipients": [
+                "applicant"
+              ],
+              "template": "fee_assessment_sms",
+              "type": "sms"
             }
-          ]
+          ],
+          "paymentIntegration": {
+            "createPaymentIntent": true,
+            "refundPolicy": "standard",
+            "webhookHandling": true
+          }
         },
         "criteria": {
           "allowBalance": false,
+          "gracePeriodExpired": true,
           "status": [
             "Correction Required"
           ],
@@ -65,14 +99,29 @@
           ]
         },
         "metadata": {
+          "configurableFees": true,
           "description": "Automatically assess a fee when the Completeness Check task is set to Correction Required",
           "errorHandling": "retry",
+          "gracePeriod": {
+            "duration": "24h",
+            "enabled": true,
+            "notifications": [
+              "12h",
+              "6h",
+              "1h"
+            ]
+          },
           "maxRetries": 3,
           "operators": {},
+          "paymentIntegration": {
+            "provider": "stripe",
+            "retryPolicy": "exponential",
+            "webhookUrl": "${config.paymentWebhookUrl}"
+          },
           "retryDelay": 5000
         },
-        "postScript": "logAction('fee_assessed', {task: criteria.task, status: criteria.status, timestamp: new Date()}); notifyApplicant('Fee assessed for correction required - please check your email for details');",
-        "preScript": "if (hasExistingFee('ABCARTSA02')) { skipAction('Duplicate fee already exists'); }"
+        "postScript": "logAction('fee_assessed', {task: criteria.task, status: criteria.status, applicationType: applicationType, feeAmount: getFeeAmount(applicationType, severity), paymentIntentId: createPaymentIntent(applicationId, getFeeAmount(applicationType, severity)), timestamp: new Date()}); notifyApplicant('Fee assessed for correction required - Amount: $' + getFeeAmount(applicationType, severity) + ' - Payment link: ' + generatePaymentUrl(applicationId)); scheduleFollowUp('payment_reminder', '24h');",
+        "preScript": "if (hasExistingFee(getFeeCode(applicationType))) { skipAction('Duplicate fee already exists'); } if (isWithinGracePeriod()) { scheduleFeeAssessment(gracePeriod.duration); skipAction('Within grace period'); }"
       }
     ]
   }
