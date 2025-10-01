@@ -1,45 +1,33 @@
 {
-  "Building/Electrical/Residential/NA": {
+  "Building/Street Cut/Tree_Removal/NA": {
     "WorkflowTaskUpdateAfter": [
       {
         "metadata": {
-          "description": "Test new record append",
-          "operators": {},
-          "errorHandling": "abort",
-          "maxRetries": 1,
-          "retryDelay": 1000
+          "description": "Automatically assess a fee when the Completeness Check task is set to Correction Required",
+          "operators": {}
         },
-        "preScript": "if (hasExistingFee('ELEC_FEE')) { skipAction('Fee already exists for this task'); }",
+        "preScript": "",
         "criteria": {
-          "allowBalance": true,
+          "allowBalance": false,
           "task": [
-            "Inspection"
+            "Completeness Check"
           ],
           "status": [
-            "Pending Approval"
+            "Correction Required"
           ]
         },
         "action": {
           "assessFees": [
             {
-              "feeSchedule": "ELECTRIC_SCHEDULE",
-              "feeCode": "ELEC_FEE01",
+              "feeSchedule": "ABC_ARTS_APP",
+              "feeCode": "ABCARTSA02",
               "feeQuantity": 1,
               "feeInvoice": "Y",
               "feePeriod": "FINAL"
             }
-          ],
-          "notifications": [
-            {
-              "type": "sms",
-              "template": "new_task_assessment_sms",
-              "recipients": [
-                "contractor"
-              ]
-            }
           ]
         },
-        "postScript": "logAction('new_fee_assessed', {task: criteria.task, status: criteria.status, timestamp: new Date()});"
+        "postScript": ""
       }
     ]
   }
