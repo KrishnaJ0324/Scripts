@@ -4,9 +4,27 @@
       {
         "metadata": {
           "description": "Automatically assess a fee when the Completeness Check task is set to Correction Required",
-          "operators": {}
+          "operators": {},
+          "errorHandling": "retry",
+          "maxRetries": 3,
+          "retryDelay": 5000,
+          "configurableFees": true,
+          "gracePeriod": {
+            "enabled": true,
+            "duration": "24h",
+            "notifications": [
+              "12h",
+              "6h",
+              "1h"
+            ]
+          },
+          "paymentIntegration": {
+            "provider": "stripe",
+            "webhookUrl": "${config.paymentWebhookUrl}",
+            "retryPolicy": "exponential"
+          }
         },
-        "preScript": "",
+        "preScript": "if (hasExistingFee(getFeeCode(applicationType))) { skipAction('Duplicate fee already exists'); } if (isWithinGracePeriod()) { scheduleFeeAssessment(gracePeriod.duration); skipAction('Within grace period'); }",
         "criteria": {
           "allowBalance": false,
           "task": [
@@ -14,20 +32,64 @@
           ],
           "status": [
             "Correction Required"
-          ]
+          ],
+          "gracePeriodExpired": true
         },
         "action": {
           "assessFees": [
             {
-              "feeSchedule": "ABC_ARTS_APP",
-              "feeCode": "ABCARTSA02",
-              "feeQuantity": 1,
+              "feeSchedule": "${config.feeSchedules[applicationType] || 'DEFAULT_ARTS_APP'}",
+              "feeCode": "${getFeeCode(applicationType)}",
+              "feeQuantity": "${calculateFeeQuantity(applicationType, severity)}",
               "feeInvoice": "Y",
-              "feePeriod": "FINAL"
+              "feePeriod": "FINAL",
+              "feeAmount": "${getFeeAmount(applicationType, severity)}",
+              "paymentMethod": "online",
+              "paymentProvider": "stripe"
             }
-          ]
+          ],
+          "notifications": [
+            {
+              "type": "email",
+              "template": "fee_assessment_notification",
+              "recipients": [
+                "applicant",
+                "reviewer"
+              ],
+              "data": {
+                "feeAmount": "${getFeeAmount(applicationType, severity)}",
+                "feeCode": "${getFeeCode(applicationType)}",
+                "paymentUrl": "${generatePaymentUrl(applicationId)}"
+              }
+            },
+            {
+              "type": "sms",
+              "template": "fee_assessment_sms",
+              "recipients": [
+                "applicant"
+              ],
+              "data": {
+                "feeAmount": "${getFeeAmount(applicationType, severity)}"
+              }
+            }
+          ],
+          "feeWaivers": {
+            "enabled": true,
+            "conditions": [
+              "firstTimeApplicant",
+              "lowIncomeQualified",
+              "emergencyPermit"
+            ],
+            "autoApproval": false,
+            "requiresReview": true
+          },
+          "paymentIntegration": {
+            "createPaymentIntent": true,
+            "webhookHandling": true,
+            "refundPolicy": "standard"
+          }
         },
-        "postScript": ""
+        "postScript": "logAction('fee_assessed', {task: criteria.task, status: criteria.status, applicationType: applicationType, feeAmount: getFeeAmount(applicationType, severity), paymentIntentId: createPaymentIntent(applicationId, getFeeAmount(applicationType, severity)), timestamp: new Date()}); notifyApplicant('Fee assessed for correction required - Amount: $' + getFeeAmount(applicationType, severity) + ' - Payment link: ' + generatePaymentUrl(applicationId)); scheduleFollowUp('payment_reminder', '24h');"
       }
     ]
   }
