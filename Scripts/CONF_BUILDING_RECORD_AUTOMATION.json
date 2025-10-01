@@ -30,5 +30,49 @@
         "postScript": ""
       }
     ]
+  },
+  "Building/Electrical/Residential/NA": {
+    "WorkflowTaskUpdateAfter": [
+      {
+        "metadata": {
+          "description": "Test new record append",
+          "operators": {},
+          "errorHandling": "abort",
+          "maxRetries": 1,
+          "retryDelay": 1000
+        },
+        "preScript": "if (hasExistingFee('ELEC_FEE')) { skipAction('Fee already exists for this task'); }",
+        "criteria": {
+          "allowBalance": true,
+          "task": [
+            "Inspection"
+          ],
+          "status": [
+            "Pending Approval"
+          ]
+        },
+        "action": {
+          "assessFees": [
+            {
+              "feeSchedule": "ELECTRIC_SCHEDULE",
+              "feeCode": "ELEC_FEE01",
+              "feeQuantity": 1,
+              "feeInvoice": "Y",
+              "feePeriod": "FINAL"
+            }
+          ],
+          "notifications": [
+            {
+              "type": "sms",
+              "template": "new_task_assessment_sms",
+              "recipients": [
+                "contractor"
+              ]
+            }
+          ]
+        },
+        "postScript": "logAction('new_fee_assessed', {task: criteria.task, status: criteria.status, timestamp: new Date()});"
+      }
+    ]
   }
 }
