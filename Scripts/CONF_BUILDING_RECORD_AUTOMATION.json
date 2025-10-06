@@ -2,59 +2,32 @@
   "Building/Street Cut/Tree_Removal/NA": {
     "WorkflowTaskUpdateAfter": [
       {
+        "metadata": {
+          "description": "Automatically assess a fee when the Completeness Check task is set to Correction Required",
+          "operators": {}
+        },
+        "preScript": "",
+        "criteria": {
+          "allowBalance": false,
+          "task": [
+            "Completeness Check"
+          ],
+          "status": [
+            "Correction Required"
+          ]
+        },
         "action": {
           "assessFees": [
             {
-              "feeAmount": "${getFeeAmount(applicationType, severity)}",
-              "feeCode": "${getFeeCode(applicationType)}",
+              "feeSchedule": "ABC_ARTS_APP",
+              "feeCode": "ABCARTSA02",
+              "feeQuantity": 1,
               "feeInvoice": "Y",
-              "feePeriod": "FINAL",
-              "feeQuantity": "${calculateFeeQuantity(applicationType, severity)}",
-              "feeSchedule": "${config.feeSchedules[applicationType] || 'DEFAULT_ARTS_APP'}"
-            }
-          ],
-          "feeWaivers": {
-            "conditions": [
-              "firstTimeApplicant",
-              "lowIncomeQualified",
-              "emergencyPermit"
-            ],
-            "enabled": true
-          },
-          "notifications": [
-            {
-              "data": {
-                "feeAmount": "${getFeeAmount(applicationType, severity)}",
-                "feeCode": "${getFeeCode(applicationType)}"
-              },
-              "recipients": [
-                "applicant",
-                "reviewer"
-              ],
-              "template": "fee_assessment_notification",
-              "type": "email"
+              "feePeriod": "FINAL"
             }
           ]
         },
-        "criteria": {
-          "allowBalance": false,
-          "status": [
-            "Correction Required"
-          ],
-          "task": [
-            "Completeness Check"
-          ]
-        },
-        "metadata": {
-          "configurableFees": true,
-          "description": "Automatically assess a fee when the Completeness Check task is set to Correction Required",
-          "errorHandling": "retry",
-          "maxRetries": 3,
-          "operators": {},
-          "retryDelay": 5000
-        },
-        "postScript": "logAction('fee_assessed', {task: criteria.task, status: criteria.status, applicationType: applicationType, feeAmount: getFeeAmount(applicationType, severity), timestamp: new Date()}); notifyApplicant('Fee assessed for correction required - Amount: $' + getFeeAmount(applicationType, severity) + ' - please check your email for details');",
-        "preScript": "if (hasExistingFee(getFeeCode(applicationType))) { skipAction('Duplicate fee already exists'); }"
+        "postScript": ""
       }
     ]
   },
