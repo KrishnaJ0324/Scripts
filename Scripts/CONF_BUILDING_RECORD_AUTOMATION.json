@@ -207,6 +207,36 @@
         },
         "postScript": "logDebug('New Construction application received and processed.');"
       }
+    ],
+    "ApplicationSubmitbefore": [
+      {
+        "metadata": {
+          "description": "Upon submission, update ASI and notify planning staff.",
+          "operators": {},
+          "id": "cf373bc8-3ad6-4494-b9f9-a2ffd30a3fc5"
+        },
+        "preScript": "",
+        "criteria": {},
+        "action": {
+          "updateASI": {
+            "asiGroup": "SUBMITTAL_INFO",
+            "asiSubGroup": null,
+            "asiLabel": "Submission Status",
+            "asiValue": "Received"
+          },
+          "notifications": [
+            {
+              "type": "email",
+              "template": "PLN_APP_RECEIVED",
+              "recipients": [
+                "planning_group",
+                "applicant"
+              ]
+            }
+          ]
+        },
+        "postScript": "logDebug('Application received and processed.');"
+      }
     ]
   }
 }
