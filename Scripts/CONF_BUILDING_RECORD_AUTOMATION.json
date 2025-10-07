@@ -158,40 +158,33 @@
     ]
   },
   "Planning/Residential/New/NA": {
-    "WorkflowTaskUpdateAfter": [
+    "ApplicationSubmitAfter": [
       {
         "metadata": {
-          "description": "When Zoning Review is 'Approved with Conditions', update ASI and notify, but only if fees are paid.",
+          "description": "Upon submission, update ASI and notify planning staff.",
           "operators": {}
         },
-        "preScript": "if (balanceDue > 0) { cancel = true; showMessage = true; comment('All fees must be paid before this task can be approved.'); }",
-        "criteria": {
-          "task": [
-            "Zoning Review"
-          ],
-          "status": [
-            "Approved with Conditions"
-          ]
-        },
+        "preScript": "",
+        "criteria": {},
         "action": {
           "updateASI": {
-            "asiGroup": "ZONING_INFO",
+            "asiGroup": "SUBMITTAL_INFO",
             "asiSubGroup": null,
-            "asiLabel": "Review Outcome",
-            "asiValue": "Approved with Conditions"
+            "asiLabel": "Submission Status",
+            "asiValue": "Received"
           },
           "notifications": [
             {
               "type": "email",
-              "template": "PLN_ZONING_CONDITIONS",
+              "template": "PLN_APP_RECEIVED",
               "recipients": [
-                "applicant",
-                "owner"
+                "planning_group",
+                "applicant"
               ]
             }
           ]
         },
-        "postScript": "logDebug('Updated ASI and sent notification for conditional approval.');"
+        "postScript": "logDebug('Application received and processed.');"
       }
     ]
   }
