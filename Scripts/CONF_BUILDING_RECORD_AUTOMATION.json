@@ -178,6 +178,34 @@
           ]
         },
         "postScript": "logDebug('Application received and processed.');"
+      },
+      {
+        "metadata": {
+          "description": "Upon submission, check Permit Type, then update ASI and notify.",
+          "operators": {},
+          "id": "2b635663-fcfd-43c3-8c0a-a4d99266c2e3"
+        },
+        "preScript": "if (AInfo['Permit Type'] != 'New Construction') { cancel = true; }",
+        "criteria": {},
+        "action": {
+          "updateASI": {
+            "asiGroup": "SUBMITTAL_INFO",
+            "asiSubGroup": null,
+            "asiLabel": "Submission Status",
+            "asiValue": "Received"
+          },
+          "notifications": [
+            {
+              "type": "email",
+              "template": "PLN_APP_RECEIVED",
+              "recipients": [
+                "planning_group",
+                "applicant"
+              ]
+            }
+          ]
+        },
+        "postScript": "logDebug('New Construction application received and processed.');"
       }
     ]
   }
