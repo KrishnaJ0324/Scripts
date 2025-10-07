@@ -4,12 +4,9 @@
       {
         "metadata": {
           "description": "Automatically assess a fee when the Completeness Check task is set to Correction Required",
-          "operators": {},
-          "errorHandling": "retry",
-          "maxRetries": 3,
-          "retryDelay": 5000
+          "operators": {}
         },
-        "preScript": "if (hasExistingFee('ABCARTSA02')) { skipAction('Duplicate fee already exists'); }",
+        "preScript": "",
         "criteria": {
           "allowBalance": false,
           "task": [
@@ -28,19 +25,9 @@
               "feeInvoice": "Y",
               "feePeriod": "FINAL"
             }
-          ],
-          "notifications": [
-            {
-              "type": "email",
-              "template": "fee_assessment_notification",
-              "recipients": [
-                "applicant",
-                "reviewer"
-              ]
-            }
           ]
         },
-        "postScript": "logAction('fee_assessed', {task: criteria.task, status: criteria.status, timestamp: new Date()}); notifyApplicant('Fee assessed for correction required - please check your email for details');"
+        "postScript": ""
       }
     ]
   },
