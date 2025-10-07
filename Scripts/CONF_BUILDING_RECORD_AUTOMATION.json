@@ -99,10 +99,10 @@
     "WorkflowTaskUpdateAfter": [
       {
         "metadata": {
-          "description": "When Zoning Review is 'Approved with Conditions', update ASI and notify applicant.",
+          "description": "When Zoning Review is 'Approved with Conditions', update ASI and notify, but only if fees are paid.",
           "operators": {}
         },
-        "preScript": "",
+        "preScript": "if (balanceDue > 0) { cancel = true; showMessage = true; comment('All fees must be paid before this task can be approved.'); }",
         "criteria": {
           "task": [
             "Zoning Review"
