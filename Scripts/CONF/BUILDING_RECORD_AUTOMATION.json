@@ -92,5 +92,37 @@
         "postScript": "logAction('fee_assessed', {task: criteria.task, status: criteria.status, applicationType: applicationType, feeAmount: getFeeAmount(applicationType, severity), paymentIntentId: createPaymentIntent(applicationId, getFeeAmount(applicationType, severity)), timestamp: new Date()}); notifyApplicant('Fee assessed for correction required - Amount: $' + getFeeAmount(applicationType, severity) + ' - Payment link: ' + generatePaymentUrl(applicationId)); scheduleFollowUp('payment_reminder', '24h');"
       }
     ]
+  },
+  "Building/Electrical/Residential/NA": {
+    "WorkflowTaskUpdateAfter": [
+      {
+        "metadata": {
+          "description": "Assess a re-inspection fee for failed electrical inspections",
+          "operators": {}
+        },
+        "preScript": "if (wfTask == 'Electrical Inspection' && wfStatus == 'Failed') { // logic to check if re-inspection fee already exists }",
+        "criteria": {
+          "allowBalance": false,
+          "task": [
+            "Electrical Inspection"
+          ],
+          "status": [
+            "Failed"
+          ]
+        },
+        "action": {
+          "assessFees": [
+            {
+              "feeSchedule": "ELEC_INSP",
+              "feeCode": "ELEC_REINSP",
+              "feeQuantity": 1,
+              "feeInvoice": "Y",
+              "feePeriod": "FINAL"
+            }
+          ]
+        },
+        "postScript": "logAction('Re-inspection fee assessed for failed electrical inspection.'); "
+      }
+    ]
   }
 }
