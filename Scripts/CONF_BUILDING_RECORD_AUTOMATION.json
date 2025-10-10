@@ -8,10 +8,10 @@
     "ApplicationSubmitAfter": [
       {
         "metadata": {
-          "description": "Upon submission, check Permit Type, then update ASI and notify.",
+          "description": "Upon submission, update ASI and notify planning staff.",
           "operators": {}
         },
-        "preScript": "if (AInfo['Permit Type'] != 'New Construction') { cancel = true; }",
+        "preScript": "",
         "criteria": {},
         "action": {
           "updateASI": {
@@ -31,7 +31,7 @@
             }
           ]
         },
-        "postScript": "logDebug('New Construction application received and processed.');"
+        "postScript": "logDebug('Application received and processed.');"
       }
     ],
     "Temporary": [
