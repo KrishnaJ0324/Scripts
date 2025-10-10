@@ -1,0 +1,38 @@
+{
+  "Planning/Residential/New/NA": {
+    "WorkflowTaskUpdateAfter": [
+      {
+        "metadata": " ----- TESTING -----"
+      }
+    ],
+    "ApplicationSubmitAfter": [
+      {
+        "metadata": {
+          "description": "Upon submission, update ASI and notify planning staff.",
+          "operators": {}
+        },
+        "preScript": "",
+        "criteria": {},
+        "action": {
+          "updateASI": {
+            "asiGroup": "SUBMITTAL_INFO",
+            "asiSubGroup": null,
+            "asiLabel": "Submission Status",
+            "asiValue": "Received"
+          },
+          "notifications": [
+            {
+              "type": "email",
+              "template": "PLN_APP_RECEIVED",
+              "recipients": [
+                "planning_group",
+                "applicant"
+              ]
+            }
+          ]
+        },
+        "postScript": "logDebug('Application received and processed.');"
+      }
+    ]
+  }
+}
