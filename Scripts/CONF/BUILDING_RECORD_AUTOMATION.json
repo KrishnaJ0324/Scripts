@@ -159,6 +159,11 @@
         },
         "postScript": "logDebug('New Construction application received and processed.');"
       }
+    ],
+    "Temporary": [
+      {
+        "Update": "latest"
+      }
     ]
   }
 }
