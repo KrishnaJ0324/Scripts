@@ -126,16 +126,13 @@
     ]
   },
   "Planning/Residential/New/NA": {
-    "WorkflowTaskUpdateAfter": [
-      {}
-    ],
     "ApplicationSubmitAfter": [
       {
         "metadata": {
-          "description": "Upon submission, update ASI and notify planning staff.",
+          "description": "Upon submission, check Permit Type, then update ASI and notify.",
           "operators": {}
         },
-        "preScript": "",
+        "preScript": "if (AInfo['Permit Type'] != 'New Construction') { cancel = true; }",
         "criteria": {},
         "action": {
           "updateASI": {
@@ -155,7 +152,7 @@
             }
           ]
         },
-        "postScript": "logDebug('Application received and processed.');"
+        "postScript": "logDebug('New Construction application received and processed.');"
       }
     ]
   }
